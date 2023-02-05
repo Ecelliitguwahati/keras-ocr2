@@ -228,6 +228,7 @@ def getBoxes(
             np.clip(text_score + link_score, 0, 1).astype("uint8"), connectivity=4
         )
         boxes = []
+        confidence = []
         for component_id in range(1, n_components):
             # Filter by size
             size = stats[component_id, cv2.CC_STAT_AREA]
@@ -237,6 +238,7 @@ def getBoxes(
 
             # If the maximum value within this connected component is less than
             # text threshold, we skip it.
+            confidence.append(np.max(textmap[labels == component_id]))
             if np.max(textmap[labels == component_id]) < detection_threshold:
                 continue
 
@@ -284,7 +286,7 @@ def getBoxes(
                 box = np.array(np.roll(box, 4 - box.sum(axis=1).argmin(), 0))
             boxes.append(2 * box)
         box_groups.append(np.array(boxes))
-    return box_groups
+    return box_groups, confidence
 
 
 class UpsampleLike(keras.layers.Layer):
@@ -775,11 +777,11 @@ class Detector:
             size_threshold: The minimum area for a word.
         """
         images = [compute_input(tools.read(image)) for image in images]
-        boxes = getBoxes(
+        boxes, confidence = getBoxes(
             self.model.predict(np.array(images), **kwargs),
             detection_threshold=detection_threshold,
             text_threshold=text_threshold,
             link_threshold=link_threshold,
             size_threshold=size_threshold,
         )
-        return boxes
+        return boxes, confidence
