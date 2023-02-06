@@ -238,10 +238,10 @@ def getBoxes(
 
             # If the maximum value within this connected component is less than
             # text threshold, we skip it.
-            confidence.append(np.max(textmap[labels == component_id]))
+            
             if np.max(textmap[labels == component_id]) < detection_threshold:
                 continue
-
+            confidence.append(np.max(textmap[labels == component_id]))
             # Make segmentation map. It is 255 where we find text, 0 otherwise.
             segmap = np.zeros_like(textmap)
             segmap[labels == component_id] = 255
