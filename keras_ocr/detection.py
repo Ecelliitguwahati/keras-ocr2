@@ -27,6 +27,7 @@ import numpy as np
 import tensorflow as tf
 import efficientnet.tfkeras as efficientnet
 from tensorflow import keras
+import tensorflow_model_optimization as tfmot
 
 from . import tools
 
@@ -670,7 +671,7 @@ class Detector:
         optimizer: The optimizer to use for training the model.
         backbone_name: The backbone to use. Currently, only 'vgg' is supported.
     """
-
+    quantize_model = tfmot.quantization.keras.quantize_model
     def __init__(
         self,
         weights="clovaai_general",
@@ -692,9 +693,9 @@ class Detector:
             )
         else:
             weights_path = None
-        self.model = build_keras_model(
+        self.model = quantize_model(build_keras_model(
             weights_path=weights_path, backbone_name=backbone_name
-        )
+        ))
         self.model.compile(loss="mse", optimizer=optimizer)
 
     def get_batch_generator(
