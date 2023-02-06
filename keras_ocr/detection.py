@@ -27,7 +27,6 @@ import numpy as np
 import tensorflow as tf
 import efficientnet.tfkeras as efficientnet
 from tensorflow import keras
-import tensorflow_model_optimization as tfmot
 
 from . import tools
 
@@ -693,11 +692,9 @@ class Detector:
             )
         else:
             weights_path = None
-        quantize_model = tfmot.quantization.keras.quantize_model
-        tfmot.quantization.keras.quantize_scope(
-        self.model = quantize_model(build_keras_model(
+        self.model = build_keras_model(
             weights_path=weights_path, backbone_name=backbone_name
-        )))
+        )
         self.model.compile(loss="mse", optimizer=optimizer)
         
     def get_batch_generator(
