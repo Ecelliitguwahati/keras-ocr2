@@ -671,7 +671,7 @@ class Detector:
         optimizer: The optimizer to use for training the model.
         backbone_name: The backbone to use. Currently, only 'vgg' is supported.
     """
-    quantize_model = tfmot.quantization.keras.quantize_model
+    
     def __init__(
         self,
         weights="clovaai_general",
@@ -693,6 +693,7 @@ class Detector:
             )
         else:
             weights_path = None
+        quantize_model = tfmot.quantization.keras.quantize_model
         self.model = quantize_model(build_keras_model(
             weights_path=weights_path, backbone_name=backbone_name
         ))
